@@ -111,7 +111,7 @@ def train():
             ('lasso', lasso)
         ],
         final_estimator=RidgeCV(),
-        n_jobs=-1
+        n_jobs=1
     )
 
     print("Training Stacking Ensemble (this may take a few minutes)...")
