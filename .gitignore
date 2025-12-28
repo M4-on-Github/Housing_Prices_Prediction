@@ -19,6 +19,7 @@ static/*.joblib
 !static/scaler.joblib
 !static/feature_columns.joblib
 !static/reference_row.joblib
+!static/categorical_values.joblib
 
 # IDEs
 .vscode/
