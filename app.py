@@ -22,7 +22,16 @@ def load_artifacts():
 
 try:
     import sklearn
-    # st.write(f"Debug: sklearn version {sklearn.__version__}")
+    # Polyfill for scikit-learn version mismatch (_loss module was moved/added in newer versions)
+    import sys
+    try:
+        import sklearn._loss
+    except ImportError:
+        # If the model was trained on a newer version (like 1.6+) but loaded in 1.5
+        # we can try to point it to the ensemble losses which it might be expecting
+        import sklearn.ensemble._gb_losses as losses
+        sys.modules['sklearn._loss'] = losses
+
     model, scaler, feature_columns, reference_row, categorical_values = load_artifacts()
 except Exception as e:
     st.error(f"Error loading model artifacts: {e}")
