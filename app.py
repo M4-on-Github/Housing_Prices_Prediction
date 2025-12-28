@@ -35,7 +35,7 @@ try:
     model, scaler, feature_columns, reference_row, categorical_values = load_artifacts()
 except Exception as e:
     st.error(f"Error loading model artifacts: {e}")
-    st.info("This is often caused by a version mismatch between the training environment (Python 3.14/sklearn 1.8) and the browser (Python 3.11/sklearn 1.5). I have updated the site to try and fix this.")
+    st.info("This is likely a version mismatch. Please ensure you train the model using **scikit-learn 1.5.2** and **xgboost 2.0.3** to match the browser environment. I have updated `requirements.txt` to help you set this up.")
     st.stop()
 
 # --- UI INPUTS ---
