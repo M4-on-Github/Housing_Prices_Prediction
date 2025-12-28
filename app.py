@@ -21,9 +21,12 @@ def load_artifacts():
     return model, scaler, feature_columns, reference_row, categorical_values
 
 try:
+    import sklearn
+    # st.write(f"Debug: sklearn version {sklearn.__version__}")
     model, scaler, feature_columns, reference_row, categorical_values = load_artifacts()
 except Exception as e:
     st.error(f"Error loading model artifacts: {e}")
+    st.info("This is often caused by a version mismatch between the training environment (Python 3.14/sklearn 1.8) and the browser (Python 3.11/sklearn 1.5). I have updated the site to try and fix this.")
     st.stop()
 
 # --- UI INPUTS ---

@@ -5,17 +5,17 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Stlite App</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.0/build/stlite.css" />
+    <title>House Price Predictor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.74.0/build/stlite.css" />
 </head>
 
 <body>
     <div id="root"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.0/build/stlite.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.74.0/build/stlite.js"></script>
     <script>
         stlite.mount(
             {
-                requirements: ["pandas", "numpy", "scikit-learn", "xgboost", "joblib", "scipy"],
+                requirements: ["pandas", "numpy", "scikit-learn>=1.5.0", "xgboost", "joblib", "scipy"],
                 entrypoint: "app.py",
                 files: {
                     "app.py": {

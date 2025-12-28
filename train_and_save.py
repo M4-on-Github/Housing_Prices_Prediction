@@ -119,15 +119,15 @@ def train():
 
     print("Saving model and artifacts...")
     os.makedirs('static', exist_ok=True)
-    joblib.dump(stack_gen, 'static/model.joblib')
-    joblib.dump(scaler, 'static/scaler.joblib')
-    joblib.dump(feature_columns, 'static/feature_columns.joblib')
+    joblib.dump(stack_gen, 'static/model.joblib', protocol=4)
+    joblib.dump(scaler, 'static/scaler.joblib', protocol=4)
+    joblib.dump(feature_columns, 'static/feature_columns.joblib', protocol=4)
     
     # Save a reference row and unique values for categorical columns
     categorical_values = {col: train_features[col].unique().tolist() 
                           for col in train_features.select_dtypes(include=['object']).columns}
-    joblib.dump(categorical_values, 'static/categorical_values.joblib')
-    joblib.dump(train_features.iloc[:1], 'static/reference_row.joblib')
+    joblib.dump(categorical_values, 'static/categorical_values.joblib', protocol=4)
+    joblib.dump(train_features.iloc[:1], 'static/reference_row.joblib', protocol=4)
     
     print("Done!")
 
