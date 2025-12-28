@@ -22,20 +22,29 @@ def load_artifacts():
 
 try:
     import sklearn
-    # Polyfill for scikit-learn version mismatch (_loss module was moved/added in newer versions)
+    import xgboost
+    import scipy
+    
+    # Display versions for debugging
+    st.sidebar.write(f"SKLearn: {sklearn.__version__}")
+    st.sidebar.write(f"XGBoost: {xgboost.__version__}")
+    
+    # Polyfill for scikit-learn version mismatch (_loss module)
     import sys
     try:
         import sklearn._loss
     except ImportError:
-        # If the model was trained on a newer version (like 1.6+) but loaded in 1.5
-        # we can try to point it to the ensemble losses which it might be expecting
-        import sklearn.ensemble._gb_losses as losses
-        sys.modules['sklearn._loss'] = losses
+        try:
+            import sklearn.ensemble._gb_losses as losses
+            sys.modules['sklearn._loss'] = losses
+        except:
+            pass
 
     model, scaler, feature_columns, reference_row, categorical_values = load_artifacts()
 except Exception as e:
-    st.error(f"Error loading model artifacts: {e}")
-    st.info("This is likely a version mismatch. Please ensure you train the model using **scikit-learn 1.5.2** and **xgboost 2.0.3** to match the browser environment. I have updated `requirements.txt` to help you set this up.")
+    st.error(f"### Error loading model artifacts")
+    st.code(str(e))
+    st.info("This often happens if the version of scikit-learn or xgboost in the browser doesn't match the version used to train the model.")
     st.stop()
 
 # --- UI INPUTS ---
