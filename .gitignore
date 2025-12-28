@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# Data and Models
+submission.csv
+static/*.joblib
+!static/model.joblib
+!static/scaler.joblib
+!static/feature_columns.joblib
+!static/reference_row.joblib
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Notebook Checkpoints
+.ipynb_checkpoints/
