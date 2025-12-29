@@ -74,11 +74,14 @@
 
         stlite.mount(
             {
-                requirements: ["pandas", "numpy", "scikit-learn", "xgboost", "joblib", "scipy"],
+                requirements: ["pandas", "numpy", "scikit-learn", "xgboost", "joblib", "scipy", "plotly", "eli5"],
                 entrypoint: "app.py",
                 files: {
                     "app.py": {
                         url: "./app.py",
+                    },
+                    "train.csv": {
+                        url: "./home-data-for-ml-course/train.csv",
                     },
                     "static/model.joblib": {
                         url: "./static/model.joblib",
