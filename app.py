@@ -20,7 +20,14 @@ def load_artifacts():
     categorical_values = joblib.load('static/categorical_values.joblib')
     return model, scaler, feature_columns, reference_row, categorical_values
 
-# --- SIDEBAR DESCRIPTION ---
+# --- SIDEBAR ---
+st.sidebar.header("🏆 Model Performance")
+col_perf1, col_perf2 = st.sidebar.columns(2)
+col_perf1.metric("RMSLE", "0.115")
+st.sidebar.info("🎯 This score ranks in the **Top 2% to 5%** of the Kaggle leaderboard.")
+st.sidebar.divider()
+
+# --- PROJECT OVERVIEW ---
 st.sidebar.header("📋 Project Overview")
 st.sidebar.markdown(
     """
