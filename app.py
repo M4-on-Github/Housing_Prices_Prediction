@@ -20,14 +20,54 @@ def load_artifacts():
     categorical_values = joblib.load('static/categorical_values.joblib')
     return model, scaler, feature_columns, reference_row, categorical_values
 
+# --- SIDEBAR DESCRIPTION ---
+st.sidebar.header("📋 Project Overview")
+st.sidebar.markdown(
+    """
+    This predictor is built using the **Ames Housing Dataset** from the [Kaggle House Prices Competition](https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques).
+    
+    ### 🧬 The Model: Stacking Ensemble
+    Instead of a single algorithm, we use a **Stacking Regressor** that aggregates four diverse models:
+    1.  **XGBoost:** Excellent at capturing non-linear patterns and feature interactions.
+    2.  **Gradient Boosting:** Focuses on minimizing residuals from previous trees.
+    3.  **Ridge Regression:** A linear approach that uses L2 regularization to prevent overfitting.
+    4.  **Lasso Regression:** Uses L1 regularization for inherent feature selection.
+    
+    **Final Meta-Model:** A RidgeCV regressor aggregates the predictions from these base models to produce the final estimate.
+    
+    ### 🛠️ Preprocessing Pipeline
+    To achieve high accuracy, the following steps were taken:
+    - **Outlier Removal:** Removed extreme living area entries that didn't follow the price trend.
+    - **Log Transformation:** Applied `log(1+x)` to the target price and skewed features to normalize distributions.
+    - **Feature Engineering:** Created composite features like *Total Square Footage* and *Total Bathrooms*.
+    - **Ordinal Encoding:** Converted quality ratings (Ex, Gd, TA, etc.) into numeric scales.
+    - **Robust Scaling:** Standardized data while being resilient to remaining outliers.
+    """
+)
+
+st.sidebar.divider()
+st.sidebar.subheader("💻 Technical Stack")
+st.sidebar.markdown(
+    """
+    - **Language:** Python 3.x
+    - **ML Frameworks:** Scikit-Learn, XGBoost
+    - **Data Ops:** Pandas, NumPy, SciPy
+    - **UI Framework:** Streamlit
+    - **Deployment:** Stlite (WebAssembly)
+    - **Hosting:** GitHub Pages
+    """
+)
+
+st.sidebar.divider()
+st.sidebar.subheader("🔧 System Info")
+
 try:
     import sklearn
     import xgboost
     import scipy
     
-    # Display versions for debugging
-    st.sidebar.write(f"SKLearn: {sklearn.__version__}")
-    st.sidebar.write(f"XGBoost: {xgboost.__version__}")
+    st.sidebar.write(f"**SKLearn:** `{sklearn.__version__}`")
+    st.sidebar.write(f"**XGBoost:** `{xgboost.__version__}`")
     
     # Polyfill for scikit-learn version mismatch (_loss module)
     import sys
@@ -48,32 +88,51 @@ except Exception as e:
     st.stop()
 
 # --- UI INPUTS ---
+st.markdown("## 📊 Kaggle Dataset Features")
+st.info("These interactive fields are mapped directly to the original [Kaggle Competition](https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques/data) dataset.")
+
+st.markdown("### 🎛️ Configure Property Attributes")
+st.write("Adjust the parameters below to see how property characteristics influence the predicted market value.")
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.subheader("Basic Features")
-    overall_qual = st.slider("Overall Quality (1-10)", 1, 10, 5)
-    gr_liv_area = st.number_input("Above Ground Living Area (sqft)", 500, 5000, 1500)
-    total_bsmt_sf = st.number_input("Total Basement Area (sqft)", 0, 3000, 1000)
-    year_built = st.number_input("Year Built", 1840, 2025, 2000)
+    st.subheader("🏗️ Structure & Quality")
+    overall_qual = st.slider("Overall Quality", 1, 10, 6, 
+                            help="Rates the overall material and finish of the house (1=Very Poor, 10=Very Excellent)")
+    gr_liv_area = st.number_input("Living Area (sqft)", 300, 6000, 1500, step=50,
+                                 help="Above grade (ground) living area square feet")
+    total_bsmt_sf = st.number_input("Basement Area (sqft)", 0, 4000, 1000, step=50,
+                                   help="Total square feet of basement area")
+    year_built = st.number_input("Year Built", 1870, 2025, 2000, step=1,
+                                help="Original construction date")
 
 with col2:
-    st.subheader("Rooms & Space")
-    full_bath = st.number_input("Full Bathrooms", 0, 5, 2)
-    half_bath = st.number_input("Half Bathrooms", 0, 5, 0)
-    tot_rms_abv_grd = st.number_input("Total Rooms Above Ground", 2, 15, 6)
-    garage_cars = st.number_input("Garage Car Capacity", 0, 5, 2)
-    garage_area = st.number_input("Garage Area (sqft)", 0, 1500, 500)
+    st.subheader("🛌 Rooms & Space")
+    full_bath = st.number_input("Full Bathrooms", 0, 5, 2, step=1,
+                               help="Full bathrooms above grade")
+    half_bath = st.number_input("Half Bathrooms", 0, 3, 0, step=1,
+                               help="Half baths above grade")
+    tot_rms_abv_grd = st.number_input("Total Rooms", 2, 15, 6, step=1,
+                                     help="Total rooms above grade (does not include bathrooms)")
+    garage_cars = st.number_input("Garage Capacity (Cars)", 0, 5, 2, step=1,
+                                 help="Size of garage in car capacity")
+    garage_area = st.number_input("Garage Area (sqft)", 0, 1500, 500, step=50,
+                                 help="Size of garage in square feet")
 
 with col3:
-    st.subheader("Location & Quality")
+    st.subheader("📍 Location & Finish")
     # Dynamically get neighborhoods
     neighborhoods = sorted(categorical_values.get('Neighborhood', ['NAmes', 'CollgCr', 'OldTown', 'Edwards', 'Somerst']))
-    neighborhood = st.selectbox("Neighborhood", neighborhoods)
+    neighborhood = st.selectbox("Neighborhood", neighborhoods, 
+                                help="Physical locations within Ames city limits")
     
-    exter_qual = st.selectbox("Exterior Quality", ['Ex', 'Gd', 'TA', 'Fa', 'Po'])
-    kitchen_qual = st.selectbox("Kitchen Quality", ['Ex', 'Gd', 'TA', 'Fa', 'Po'])
-    fireplace_qu = st.selectbox("Fireplace Quality", ['Ex', 'Gd', 'TA', 'Fa', 'Po', 'None'])
+    exter_qual = st.selectbox("Exterior Quality", ['Ex', 'Gd', 'TA', 'Fa', 'Po'], index=2,
+                             help="Evaluates the quality of the material on the exterior (Ex=Excellent, TA=Average/Typical)")
+    kitchen_qual = st.selectbox("Kitchen Quality", ['Ex', 'Gd', 'TA', 'Fa', 'Po'], index=2,
+                               help="Kitchen quality (Ex=Excellent, TA=Average/Typical)")
+    fireplace_qu = st.selectbox("Fireplace Quality", ['Ex', 'Gd', 'TA', 'Fa', 'Po', 'None'], index=5,
+                               help="Fireplace quality (None if no fireplace)")
 
 if st.button("💰 Predict Sale Price", use_container_width=True):
     # 1. Create a row with user inputs

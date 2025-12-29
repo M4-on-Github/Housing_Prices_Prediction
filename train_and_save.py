@@ -12,10 +12,8 @@ import os
 warnings.filterwarnings('ignore')
 
 def preprocess_data(train_features, test_features):
-    # Combine for uniform processing
     all_data = pd.concat([train_features, test_features]).reset_index(drop=True)
 
-    # 4. CLEANING & FEATURE ENGINEERING
     # A. Impute LotFrontage by Neighborhood
     all_data['LotFrontage'] = all_data.groupby('Neighborhood')['LotFrontage'].transform(
         lambda x: x.fillna(x.median()))
@@ -85,8 +83,8 @@ def train():
     scaler = RobustScaler()
     X_scaled = scaler.fit_transform(X)
 
-    # Define Models (hyperparams from notebook - REDUCED for better deployment performance)
-    xgboost = XGBRegressor(learning_rate=0.01, n_estimators=1000,
+    # Full Stacking Ensemble
+    xgboost = XGBRegressor(learning_rate=0.01, n_estimators=3460,
                            max_depth=3, min_child_weight=0,
                            gamma=0, subsample=0.7,
                            colsample_bytree=0.7,
@@ -94,7 +92,7 @@ def train():
                            scale_pos_weight=1, seed=27,
                            reg_alpha=0.00006)
 
-    gbr = GradientBoostingRegressor(n_estimators=1000, learning_rate=0.05,
+    gbr = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
                                     max_depth=4, max_features='sqrt',
                                     min_samples_leaf=15, min_samples_split=10, 
                                     loss='huber', random_state=5)
@@ -114,22 +112,20 @@ def train():
         n_jobs=1
     )
 
-    print("Training Stacking Ensemble (optimized for WASM)...")
+    print("Training Full Stacking Ensemble...")
     stack_gen.fit(X_scaled, y)
 
-    print("Saving model and artifacts with compression...")
+    print("Saving model artifacts...")
     os.makedirs('static', exist_ok=True)
-    # Using compression=3 to significantly reduce file size for web deployment
     joblib.dump(stack_gen, 'static/model.joblib', compress=3)
     joblib.dump(scaler, 'static/scaler.joblib', compress=3)
     joblib.dump(feature_columns, 'static/feature_columns.joblib', compress=3)
     
-    # Save a reference row and unique values for categorical columns
     categorical_values = {col: train_features[col].unique().tolist() 
                           for col in train_features.select_dtypes(include=['object']).columns}
     joblib.dump(categorical_values, 'static/categorical_values.joblib', compress=3)
     joblib.dump(train_features.iloc[:1], 'static/reference_row.joblib', compress=3)
-    
+
     print("Done!")
 
 if __name__ == "__main__":
