@@ -6,3 +6,4 @@ xgboost
 joblib
 streamlit
 plotly
+altair<5
