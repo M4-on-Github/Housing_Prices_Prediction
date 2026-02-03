@@ -4,6 +4,6 @@ scipy
 scikit-learn
 xgboost
 joblib
-streamlit
+streamlit>=1.41.0
 plotly
-altair<5
+altair>=5.0.0
